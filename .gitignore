@@ -1,0 +1,10 @@
+## Игнорируем папки сборки
+[Bb]in/
+[Oo]bj/
+.vs/
+
+## Игнорируем файлы настроек IDE
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

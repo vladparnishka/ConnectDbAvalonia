@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:ConnectDbAvalonia.Models"
+        x:Class="ConnectDbAvalonia.MainWindow"
+        Title="Информационная система Базы Отдыха" Width="1200" Height="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFFFFF">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="80"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!-- Шапка -->
+		<Border Grid.Row="0" Background="#E0F2F1" Padding="20,10">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Text="База Отдыха" FontSize="26" FontWeight="Bold"
+                           Foreground="#00796B" VerticalAlignment="Center"/>
+
+				<!-- Кнопки навигации -->
+				<StackPanel x:Name="NavPanel" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False">
+					<Button Content="Каталог домиков" Margin="5" Padding="15,8" FontSize="14" Click="CatalogClick"/>
+					<Button x:Name="BookingsButton" Content="Мои брони" Margin="5" Padding="15,8" FontSize="14" IsVisible="False" Click="BookingsClick"/>
+				</StackPanel>
+
+				<!-- Панель входа -->
+				<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+					<StackPanel x:Name="LoginPanel" Orientation="Horizontal">
+						<ComboBox x:Name="UsersCombo" Width="200" PlaceholderText="Выберите пользователя" />
+						<Button Content="Войти" Margin="5,0,0,0" Padding="15,5" Click="LoginClick"/>
+					</StackPanel>
+
+					<StackPanel x:Name="UserInfoPanel" Orientation="Horizontal" IsVisible="False">
+						<TextBlock x:Name="UserText" VerticalAlignment="Center" FontSize="14" Margin="0,0,10,0" Foreground="#00796B" FontWeight="Bold"/>
+						<Button Content="Выйти" Click="LogoutClick" Padding="10,5"/>
+					</StackPanel>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Основная область -->
+		<Grid Grid.Row="1">
+			<!-- Экран 1: Каталог домиков -->
+			<Grid x:Name="CatalogGrid" ColumnDefinitions="*, 350">
+				<ListBox x:Name="HousesList" Margin="20" FontSize="18" SelectionChanged="HouseSelected">
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="models:House">
+							<TextBlock Text="{Binding HouseName}" />
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<Border Grid.Column="1" Background="#F5F5F5" Padding="20" IsVisible="False" x:Name="BookingPanel">
+					<StackPanel Spacing="15">
+						<TextBlock Text="Оформление брони" FontSize="20" FontWeight="Bold" Foreground="#00796B"/>
+						<TextBlock x:Name="SelectedHouseName" FontWeight="Bold" FontSize="16" TextWrapping="Wrap"/>
+
+						<StackPanel>
+							<TextBlock Text="Количество ночей:"/>
+							<NumericUpDown x:Name="NightsInput" Minimum="1" Value="1" ValueChanged="CalculatePrice"/>
+						</StackPanel>
+
+						<StackPanel>
+							<TextBlock Text="Количество мест:"/>
+							<NumericUpDown x:Name="SeatsInput" Minimum="1" Value="1" ValueChanged="CalculatePrice"/>
+						</StackPanel>
+
+						<TextBlock x:Name="PriceOutput" FontWeight="Bold" FontSize="18" Foreground="DarkGreen"/>
+						<Button Content="Забронировать" Click="BookClick" Padding="20,10" Background="#00796B" Foreground="White" FontWeight="Bold"/>
+					</StackPanel>
+				</Border>
+			</Grid>
+
+			<!-- Экран 2: Список броней (скрыт по умолчанию) -->
+			<Grid x:Name="BookingsGrid" IsVisible="False">
+				<ListBox x:Name="BookingsList" Margin="20" FontSize="16">
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="models:Booking">
+							<Border Background="#F5F5F5" Padding="10" Margin="0,5" CornerRadius="5">
+								<StackPanel Spacing="5">
+									<!-- Номер и дата брони -->
+									<StackPanel Orientation="Horizontal" Spacing="15">
+										<TextBlock Text="{Binding BookingId, StringFormat='Бронь № {0}'}" FontWeight="Bold" Foreground="#00796B"/>
+										<TextBlock Text="{Binding BookingDate, StringFormat='Дата оформления: {0:dd.MM.yyyy}'}"/>
+
+										<!-- ВОТ ЭТА СТРОЧКА: Выводим ФИО клиента -->
+										<TextBlock Text="{Binding Client.LastName, StringFormat='Клиент: {0}'}" FontWeight="Bold" Foreground="#333333"/>
+									</StackPanel>
+
+									<!-- Информация о забронированных домиках (позиции брони) -->
+									<ItemsControl ItemsSource="{Binding BookingItems}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="models:BookingItem">
+												<StackPanel Orientation="Horizontal" Spacing="10" Margin="10,2,0,0">
+													<TextBlock Text="🏠" Foreground="#00796B"/>
+													<TextBlock Text="{Binding Shift.House.HouseName}" FontWeight="SemiBold"/>
+													<TextBlock Text="{Binding Shift.ShiftName, StringFormat='({0})'}" Foreground="Gray"/>
+													<TextBlock Text="{Binding Quantity, StringFormat='Мест: {0}'}"/>
+												</StackPanel>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</StackPanel>
+							</Border>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>
